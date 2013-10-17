@@ -35,35 +35,34 @@
 	        $element.parent().prepend('<p class="enlargeCT" title="Agrandir le tableau"><img class="enlargeBT" src="'+$settings.imgPath+'enlarge.png" /></p>');
 	        if($settings.tooltip)
 				$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg });
-			/* enlarge click */
-			$('.enlargeCT').on('click','.enlargeBT',function(){
+			$('.enlargeCT').on('click','img',function(){
 				var $this = $(this);
 				var $parent = $this.closest('div');
-				$parentWidth = $parent.width();
-				$parent.animate({width:$settings.enlargeWidth+'px'},$settings.speed);
-				$element.animate({height:'100%', width:($settings.enlargeWidth)+'px'},$settings.speed);
-				if($elementHasMaxHeight>0){ /* verify if element has a define max-height */
-					$elementMaxHeight=$element.css('max-height');
-					$element.css('max-height','100%');
+				/* enlarge bt action */
+				if($this.hasClass('enlargeBT')){
+					var $tooltipMsg=$settings.reduceMsg;
+					$parentWidth = $parent.width();
+					$parent.animate({width:$settings.enlargeWidth+'px'},$settings.speed);
+					$element.animate({height:'100%', width:($settings.enlargeWidth)+'px'},$settings.speed);
+					if($elementHasMaxHeight>0){ /* verify if element has a define max-height */
+						$elementMaxHeight=$element.css('max-height');
+						$element.css('max-height','100%');
+					}
+					$this.attr('src',$settings.imgPath+'reduce.png').removeClass('enlargeBT').addClass('reduceBT');
+				/* reduce bt action */
+				}else if($this.hasClass('reduceBT')){
+					var $tooltipMsg=$settings.enlargeMsg;
+					$parent.animate({width:$parentWidth+'px'},$settings.speed);
+					$element.animate({width:$elementWidth+'px'},$settings.speed);
+					if($elementHasMaxHeight>0){ /* verify if element has a define max-height */
+						$element.css('max-height',$elementMaxHeight);
+					}
+					$this.attr('src',$settings.imgPath+'enlarge.png').removeClass('reduceBT').addClass('enlargeBT');
+					
 				}
-				$this.attr('src',$settings.imgPath+'reduce.png').removeClass('enlargeBT').addClass('reduceBT');
 				if($settings.tooltip)
-					$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.reduceMsg });
+					$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipMsg });
 			});
-			/* reduce click */
-			$('.enlargeCT').on('click','.reduceBT',function(){
-				var $this = $(this);
-				var $parent = $this.closest('div');
-				$parent.animate({width:$parentWidth+'px'},$settings.speed);
-				$element.animate({width:$elementWidth+'px'},$settings.speed);
-				if($elementHasMaxHeight>0){ /* verify if element has a define max-height */
-					$element.css('max-height',$elementMaxHeight);
-				}
-				$this.attr('src',$settings.imgPath+'enlarge.png').removeClass('reduceBT').addClass('enlargeBT');
-				if($settings.tooltip)
-					$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg });
-			});
-			// return this;
 		});
     };
 }( $ ));
