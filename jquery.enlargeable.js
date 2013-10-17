@@ -8,6 +8,15 @@
  * 
  * HOW TO : $(element).enlargeable({imgPath:'img/bt/'});
  * 
+ * HTML EXAMPLE 1 :
+ * 	<div class="enlargeable">
+ * 		<table>
+ * 
+ * HTML EXAMPLE 2 :
+ * 	<div class="enlargeablePrison">
+ * 		<div class="enlargeable">
+ * 			<table>
+ * 
  * TODO add callbacks
  * TODO make bt img as background
  * TODO make the plugin more flexible
@@ -15,7 +24,7 @@
  *
  */
 (function ( $ ) {
-    var enlargeable = function( options ) {
+    var Enlargeable = function( options ) {
     	var $element = this; //the enlargeable element
     	var $settings = $.extend({ //setting options
     		imgPath:'img/',
@@ -38,12 +47,14 @@
 				$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg });
 			$(document).on('click','.enlargeCT img',function(){
 				var $this = $(this);
-				var $parent = $this.closest('div');
+				var $parent = $this.closest('.enlargeablePrison');
 				/* enlarge bt action */
 				if($this.hasClass('enlargeBT')){
 					var $tooltipMsg=$settings.reduceMsg;
-					$parentWidth = $parent.width();
-					$parent.animate({width:$settings.enlargeWidth+'px'},$settings.speed);
+					if($parent.length>0){
+						$parentWidth = $parent.width();
+						$parent.animate({width:$settings.enlargeWidth+'px'},$settings.speed);
+					}
 					$element.animate({height:'100%', width:($settings.enlargeWidth)+'px'},$settings.speed);
 					if($elementHasMaxHeight>0){ //verify if element has a define max-height
 						$elementMaxHeight=$element.css('max-height');
@@ -53,7 +64,9 @@
 				/* reduce bt action */
 				}else if($this.hasClass('reduceBT')){
 					var $tooltipMsg=$settings.enlargeMsg;
-					$parent.animate({width:$parentWidth+'px'},$settings.speed);
+					if($parent.length>0){
+						$parent.animate({width:$parentWidth+'px'},$settings.speed);
+					}
 					$element.animate({width:$elementWidth+'px'},$settings.speed);
 					if($elementHasMaxHeight>0){ //verify if element has a define max-height
 						$element.css('max-height',$elementMaxHeight);
@@ -67,5 +80,5 @@
 		});
     };
     /* jQuery aliases */
-	$.fn.enlargeable = enlargeable;
+	$.fn.enlargeable = Enlargeable;
 }( $ ));
