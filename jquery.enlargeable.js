@@ -1,5 +1,5 @@
 /*
- * Jquery Enlargeable plugin - v0.6
+ * Jquery Enlargeable plugin - v0.6 - https://github.com/popallo/enlargeable
  * Creation => 16-10-2013
  * Update => 17-10-2013
  * © 2013, Aurélien Dazy, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
@@ -26,14 +26,7 @@
 (function ( $ ) {
     var Enlargeable = function( options ) {
     	var $element = this; //the enlargeable element
-    	var $settings = $.extend({ //setting options
-    		imgPath:'img/',
-    		tooltip:true,
-    		enlargeWidth:'958', //target width
-    		enlargeMsg:'',
-    		reduceMsg:'',
-    		speed:'500'
-        }, options );
+    	var $settings = $.extend({}, Enlargeable.settings, options);
         $element.each(function(){
 	    	var $elementWidth = $element.width(); //element's width
 			var $elementHasMaxHeight = $element.css('max-height').length;
@@ -79,6 +72,16 @@
 			});
 		});
     };
+    
+    Enlargeable.settings = {
+    	imgPath:'img/',
+		tooltip:true,
+		enlargeWidth:'958', //target width
+		enlargeMsg:'',
+		reduceMsg:'',
+		speed:'500'
+    };
+    
     /* jQuery aliases */
 	$.fn.enlargeable = Enlargeable;
 }( $ ));
