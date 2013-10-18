@@ -1,5 +1,5 @@
 /*
- * Jquery Enlargeable plugin - v0.6 - https://github.com/popallo/enlargeable
+ * Jquery Enlargeable plugin - v0.7 - https://github.com/popallo/enlargeable
  * Creation => 16-10-2013
  * Update => 17-10-2013
  * © 2013, Aurélien Dazy, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
@@ -29,22 +29,24 @@
         this.each(function(){
         	var $element = $(this); //the enlargeable element
 	    	var $elementWidth = $element.width(); //element's width
-			var $elementHasMaxHeight = $element.css('max-height').length;
+			var $elementHasMaxHeight = $element.css('max-height').length; //useful if element has a max-height defined
 			var $parentWidth = '';
+			var $tooltipMsg='';
         	/* in case of "tooltip" option is true, test if jquery ui is in da place ! */
 	        if($settings.tooltip && !$.ui){
 	        	throw new Error('jquery.enlargeable requires jQuery ui 1.10.x OR make "tooltip" option to FALSE');
 	        }
 	        /* make the enlarge button */
 	        $element.parent().prepend('<div class="enlargeBT" title="Agrandir le tableau"></div>');
-	        if($settings.tooltip)
-				$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg });
+	        /* tooltip init if "tooltip" option is true */
+	        $settings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg }):'';
+	        /* click */
 			$('.enlargeBT',$element.parent()).on('click',function(){
 				var $this = $(this);
 				var $parents = $this.parents('.enlargeablePrison');
 				/* enlarge bt action */
 				if(!$this.hasClass('reduce')){
-					var $tooltipMsg=$settings.reduceMsg;
+					$tooltipMsg=$settings.reduceMsg;
 					$parents.each(function(){
 						$parentWidth = $parents.width();
 						$(this).animate({width:$settings.enlargeWidth+'px'},$settings.speed);
@@ -54,10 +56,9 @@
 						$elementMaxHeight=$element.css('max-height');
 						$element.css('max-height','100%');
 					}
-					
 				/* reduce bt action */
 				}else{
-					var $tooltipMsg=$settings.enlargeMsg;
+					$tooltipMsg=$settings.enlargeMsg;
 					$parents.each(function(){
 						$(this).animate({width:$parentWidth+'px'},$settings.speed);
 					});
@@ -68,9 +69,8 @@
 					
 					
 				}
-				$this.toggleClass('reduce');
-				if($settings.tooltip)
-					$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipMsg });
+				$this.toggleClass('reduce'); //add or remove .reduce class
+				$settings.tooltip?$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipMsg }):'';
 			});
 		});
     };
