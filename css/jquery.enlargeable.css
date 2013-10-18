@@ -1,0 +1,12 @@
+.enlargeBT{
+	text-align:right;
+	margin:5px;
+	height:24px;
+	width:24px;
+	cursor:pointer;
+	float:right;
+	background:transparent url(../img/enlarge.png) no-repeat 0 0;
+}
+.enlargeBT.reduce {
+	background-image:url(../img/reduce.png);
+}
