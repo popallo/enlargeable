@@ -6,7 +6,7 @@
  * 
  * DEPENDS : jquery >= 1.10.x, jquery ui >= 1.10.x (optional)
  * 
- * HOW TO : $(element).enlargeable({imgPath:'img/bt/'});
+ * HOW TO : $(element).enlargeable({option:value});
  * 
  * HTML EXAMPLE 1 :
  * 	<div class="enlargeable">
@@ -68,7 +68,7 @@
 					
 					
 				}
-				$this.attr('src',$settings.imgPath+'reduce.png').toggleClass('reduce');
+				$this.toggleClass('reduce');
 				if($settings.tooltip)
 					$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipMsg });
 			});
@@ -76,7 +76,6 @@
     };
     
     Enlargeable.settings = {
-    	imgPath:'img/',
 		tooltip:false,
 		enlargeWidth:'958', //target width
 		enlargeMsg:'',
