@@ -48,7 +48,7 @@
 	        $oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 	        /* click */
 			$($enlargeBT,$element.parent()).on('click',function(){
-				if(!activeClick){
+				if(!activeClick){ //flood click protection ^^
 					return;
 				}
 				activeClick = false;
@@ -75,7 +75,8 @@
 				$enlargeBT.toggleClass('reduce'); //add or remove .reduce class
 				/* set tooltip title */
 				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
-				setTimeout(function() {activeClick = true;},$oSettings.speed);
+				/* reactive "click" when timeout = speed option */
+				setTimeout(function() {activeClick = true;}, $oSettings.speed);
 			});
 
 		});
