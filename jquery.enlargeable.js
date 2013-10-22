@@ -1,7 +1,7 @@
 /*
  * Jquery Enlargeable plugin - https://github.com/popallo/enlargeable
  * Creation => 16-10-2013
- * Update => 17-10-2013
+ * Update => 22-10-2013
  * © 2013, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
  * @author popallo
  * @version 0.9.2
