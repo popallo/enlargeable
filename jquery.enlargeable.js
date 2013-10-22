@@ -1,8 +1,10 @@
 /*
- * Jquery Enlargeable plugin - v0.7 - https://github.com/popallo/enlargeable
+ * Jquery Enlargeable plugin - https://github.com/popallo/enlargeable
  * Creation => 16-10-2013
  * Update => 17-10-2013
- * © 2013, Aurélien Dazy, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
+ * © 2013, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
+ * @author popallo
+ * @version 0.9
  * 
  * DEPENDS : jquery >= 1.10.x, jquery ui >= 1.10.x (optional)
  * 
@@ -17,60 +19,50 @@
  * 		<div class="enlargeable">
  * 			<table>
  * 
- * TODO add callbacks
+ * TODO add more callbacks
  * TODO make enlargeable fullscreenable... ^^
+ * TODO make enlargeable skinnable... ^^
+ * TODO make it works for "enlarge" or "reduce" size first 
  * TODO make the plugin more flexible
  * TODO more and more and more ...
  *
  */
-(function ( $ ) {
+;(function ( $ ) {
+	'use strict';
     var Enlargeable = function( options ) {
-    	var $settings = $.extend({}, Enlargeable.settings, options);
-        this.each(function(){
-        	var $element = $(this); //the enlargeable element
-	    	var $elementWidth = $element.width(); //element's width
-			var $elementHasMaxHeight = $element.css('max-height').length; //useful if element has a max-height defined
-			var $parentWidth = '';
-			var $tooltipMsg='';
+    	var $self = this;
+        return this.each(function(){
+        	var $oSettings = $.extend({}, Enlargeable.settings, options),
+				$element = $(this),
+        		$enlargeBT = $('<div/>').addClass('enlargeBT').attr('title',''),
+        		$tooltipTitle=$oSettings.enlargeTitle;
+        	/* set options */
+        	$oSettings.fnInit($oSettings);
         	/* in case of "tooltip" option is true, test if jquery ui is in da place ! */
-	        if($settings.tooltip && !$.ui){
+	        if($oSettings.tooltip && !$.ui){
 	        	throw new Error('jquery.enlargeable requires jQuery ui 1.10.x OR make "tooltip" option to FALSE');
 	        }
 	        /* make the enlarge button */
-	        $element.parent().prepend('<div class="enlargeBT" title="Agrandir le tableau"></div>');
+	        $element.parent().prepend($enlargeBT);
 	        /* tooltip init if "tooltip" option is true */
-	        $settings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $settings.enlargeMsg }):'';
+	        $oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 	        /* click */
 			$('.enlargeBT',$element.parent()).on('click',function(){
-				var $this = $(this);
-				var $parents = $this.parents('.enlargeablePrison');
+				var $bt = $(this),
+					$element = $bt.next();
+				/* after click callback */
+				$oSettings.fnAfterClick($oSettings);
 				/* enlarge bt action */
-				if(!$this.hasClass('reduce')){
-					$tooltipMsg=$settings.reduceMsg;
-					$parents.each(function(){
-						$parentWidth = $parents.width();
-						$(this).animate({width:$settings.enlargeWidth+'px'},$settings.speed);
-					});
-					$element.animate({height:'100%', width:($settings.enlargeWidth)+'px'},$settings.speed);
-					if($elementHasMaxHeight>0){ //verify if element has a define max-height
-						$elementMaxHeight=$element.css('max-height');
-						$element.css('max-height','100%');
-					}
+				if(!$element.hasClass('reduce')){
+					$self.originalSize = Enlargeable.enlarge($oSettings, $element);
+					$tooltipTitle=$oSettings.reduceTitle;
 				/* reduce bt action */
 				}else{
-					$tooltipMsg=$settings.enlargeMsg;
-					$parents.each(function(){
-						$(this).animate({width:$parentWidth+'px'},$settings.speed);
-					});
-					$element.animate({width:$elementWidth+'px'},$settings.speed);
-					if($elementHasMaxHeight>0){ //verify if element has a define max-height
-						$element.css('max-height',$elementMaxHeight);
-					}
-					
-					
+					Enlargeable.reduce($oSettings, $self.originalSize);
+					$tooltipTitle=$oSettings.enlargeTitle;
 				}
-				$this.toggleClass('reduce'); //add or remove .reduce class
-				$settings.tooltip?$this.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipMsg }):'';
+				$element.toggleClass('reduce'); //add or remove .reduce class
+				$oSettings.tooltip?$bt.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 			});
 		});
     };
@@ -78,9 +70,60 @@
     Enlargeable.settings = {
 		tooltip:false,
 		enlargeWidth:'958', //target width
-		enlargeMsg:'',
-		reduceMsg:'',
-		speed:'500'
+		enlargeTitle:'',
+		reduceTitle:'',
+		speed:'500',
+		fnInit: function($oSettings){},
+		fnAfterClick: function($oSettings){},
+		fnEnlarge: function($oSettings){},
+		fnReduce: function($oSettings){}
+    };
+    /*
+     * Function enlarge
+     * 
+     */
+    Enlargeable.enlarge = function($oSettings, $element) {
+		var $oElement = { //the enlargeable element
+			element:$element,
+			width:$element.width(),
+			height:$element.height()
+		},
+		$elementMaxHeight = $element.css('max-height').length, //useful if element has a max-height defined
+		$parents = $element.parents('.enlargeablePrison'),
+		$aParents = [],
+		$o = {};
+		$parents.each(function(){
+			var $this = $(this);
+			$aParents.push({
+				element:$this,
+				width:$this.width(),
+				height:$this.height()
+			});
+			$this.animate({width:$oSettings.enlargeWidth+'px',height:'100%'},$oSettings.speed);
+		});
+		$element.animate({height:'100%', width:($oSettings.enlargeWidth)+'px'},$oSettings.speed, function(){
+			$oSettings.fnEnlarge($oSettings);
+		});
+		if($elementMaxHeight>0){
+			$element.css('max-height','100%');
+		}
+		return $o = {
+			oElement:$oElement,
+			aParents:$aParents
+		};
+    };
+    /*
+     * Function reduce
+     * 
+     */
+    Enlargeable.reduce = function($oSettings, $oSize) {
+    	var $element = $oSize.oElement.element;
+    	$.each($oSize.aParents, function(){
+			this.element.animate({width:this.width+'px',height:this.height+'px'},$oSettings.speed);
+    	});
+		$element.animate({width:$oSize.oElement.width+'px',height:$oSize.oElement.height+'px'},$oSettings.speed, function(){
+			$oSettings.fnReduce($oSettings);
+		});
     };
     
     /* jQuery aliases */
