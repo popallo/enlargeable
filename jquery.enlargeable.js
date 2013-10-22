@@ -4,7 +4,7 @@
  * Update => 17-10-2013
  * © 2013, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
  * @author popallo
- * @version 0.9
+ * @version 0.9.1
  * 
  * DEPENDS : jquery >= 1.10.x, jquery ui >= 1.10.x (optional)
  * 
@@ -19,7 +19,6 @@
  * 		<div class="enlargeable">
  * 			<table>
  * 
- * TODO add more callbacks
  * TODO make enlargeable fullscreenable... ^^
  * TODO make enlargeable skinnable... ^^
  * TODO make it works for "enlarge" or "reduce" size first 
@@ -47,51 +46,61 @@
 	        /* tooltip init if "tooltip" option is true */
 	        $oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 	        /* click */
-			$('.enlargeBT',$element.parent()).on('click',function(){
-				var $bt = $(this),
-					$element = $bt.next();
-				/* after click callback */
-				$oSettings.fnAfterClick($oSettings);
-				/* enlarge bt action */
-				if(!$element.hasClass('reduce')){
+			$($enlargeBT,$element.parent()).on('click',function(){
+				/* enlarge action */
+				if(!$enlargeBT.hasClass('reduce')){
+					/* enlarge click callback */
+					$oSettings.fnEnlargeClick($oSettings);
+					/* enlarge function */
 					$self.originalSize = Enlargeable.enlarge($oSettings, $element);
+					/* redefine tooltip title -> return elements with their original sizes */
 					$tooltipTitle=$oSettings.reduceTitle;
-				/* reduce bt action */
+				/* reduce action */
 				}else{
+					/* reduce click callback */
+					$oSettings.fnReduceClick($oSettings);
+					/* reduce function */
 					Enlargeable.reduce($oSettings, $self.originalSize);
+					/* redefine tooltip title */
 					$tooltipTitle=$oSettings.enlargeTitle;
 				}
-				$element.toggleClass('reduce'); //add or remove .reduce class
-				$oSettings.tooltip?$bt.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
+				/* add or remove "reduce" class to the enlarge button */
+				$enlargeBT.toggleClass('reduce'); //add or remove .reduce class
+				/* set tooltip title */
+				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 			});
 		});
     };
     
     Enlargeable.settings = {
 		tooltip:false,
-		enlargeWidth:'958', //target width
-		enlargeTitle:'',
-		reduceTitle:'',
-		speed:'500',
-		fnInit: function($oSettings){},
-		fnAfterClick: function($oSettings){},
-		fnEnlarge: function($oSettings){},
-		fnReduce: function($oSettings){}
+		enlargeWidth:'958',						//target width
+		enlargeTitle:'',						//tooltip title for enlarge action
+		reduceTitle:'',							//tooltip title for reduce action
+		speed:'500',							//animation speed
+		fnInit: function($oSettings){},			//init callback
+		fnEnlargeClick: function($oSettings){},	//enlarge click callback
+		fnReduceClick: function($oSettings){},	//reduce click callback
+		fnEnlarge: function($oSettings){},		//after enlarge callback
+		fnReduce: function($oSettings){}		//after reduce callback
     };
     /*
      * Function enlarge
      * 
+     * @param {obj}        $oSettings, enlargeable settings object
+     * @param {jquery obj} $element, the enlargeable element
+     * 
      */
     Enlargeable.enlarge = function($oSettings, $element) {
-		var $oElement = { //the enlargeable element
-			element:$element,
-			width:$element.width(),
-			height:$element.height()
-		},
-		$elementMaxHeight = $element.css('max-height').length, //useful if element has a max-height defined
-		$parents = $element.parents('.enlargeablePrison'),
-		$aParents = [],
-		$o = {};
+		var $oElement = {
+				element:$element,
+				width:$element.width(),
+				height:$element.height()
+			},
+			$elementMaxHeight = $element.css('max-height').length, //useful if element has a max-height defined
+			$parents = $element.parents('.enlargeablePrison'),
+			$aParents = [],
+			$o = {};
 		$parents.each(function(){
 			var $this = $(this);
 			$aParents.push({
@@ -114,6 +123,9 @@
     };
     /*
      * Function reduce
+     * 
+     * @param {obj}    $oSettings, enlargeable settings object
+     * @param {obj}    $oSize, enlargeable element and enlargeablePrison elements originals sizes
      * 
      */
     Enlargeable.reduce = function($oSettings, $oSize) {
