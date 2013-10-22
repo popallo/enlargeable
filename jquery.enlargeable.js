@@ -4,7 +4,7 @@
  * Update => 17-10-2013
  * © 2013, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
  * @author popallo
- * @version 0.9.1
+ * @version 0.9.2
  * 
  * DEPENDS : jquery >= 1.10.x, jquery ui >= 1.10.x (optional)
  * 
@@ -34,7 +34,8 @@
         	var $oSettings = $.extend({}, Enlargeable.settings, options),
 				$element = $(this),
         		$enlargeBT = $('<div/>').addClass('enlargeBT').attr('title',''),
-        		$tooltipTitle=$oSettings.enlargeTitle;
+        		$tooltipTitle=$oSettings.enlargeTitle,
+        		activeClick = true;
         	/* set options */
         	$oSettings.fnInit($oSettings);
         	/* in case of "tooltip" option is true, test if jquery ui is in da place ! */
@@ -47,8 +48,13 @@
 	        $oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
 	        /* click */
 			$($enlargeBT,$element.parent()).on('click',function(){
+				if(!activeClick){
+					return;
+				}
+				activeClick = false;
 				/* enlarge action */
 				if(!$enlargeBT.hasClass('reduce')){
+					$enlargeBT.toggleClass('enlargeAction');
 					/* enlarge click callback */
 					$oSettings.fnEnlargeClick($oSettings);
 					/* enlarge function */
@@ -57,6 +63,7 @@
 					$tooltipTitle=$oSettings.reduceTitle;
 				/* reduce action */
 				}else{
+					$enlargeBT.toggleClass('enlargeAction');
 					/* reduce click callback */
 					$oSettings.fnReduceClick($oSettings);
 					/* reduce function */
@@ -68,7 +75,9 @@
 				$enlargeBT.toggleClass('reduce'); //add or remove .reduce class
 				/* set tooltip title */
 				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
+				setTimeout(function() {activeClick = true;},$oSettings.speed);
 			});
+
 		});
     };
     
