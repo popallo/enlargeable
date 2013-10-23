@@ -28,77 +28,74 @@
  */
 ;(function ( $ ) {
 	'use strict';
-    var Enlargeable = function( options ) {
+	var Enlargeable = function( $options ) {
     	var $self = this;
-        return this.each(function(){
-        	var $oSettings = $.extend({}, Enlargeable.settings, options),
+		return this.each(function(){
+        	var $oSettings = $.extend({}, Enlargeable.settings, $options),
 				$element = $(this),
         		$enlargeBT = $('<div/>').addClass('enlargeBT').attr('title',''),
-        		$tooltipTitle=$oSettings.enlargeTitle,
-        		activeClick = true;
+        		$tipTitle=$oSettings.enlargeTitle,
+        		$activeClick = true;
         	/* set options */
         	$oSettings.fnInit($oSettings);
         	/* in case of "tooltip" option is true, test if jquery ui is in da place ! */
-	        if($oSettings.tooltip && !$.ui){
+			if($oSettings.tooltip && !$.ui){
 	        	throw new Error('jquery.enlargeable requires jQuery ui 1.10.x OR make "tooltip" option to FALSE');
-	        }
-	        /* make the enlarge button */
-	        $element.parent().prepend($enlargeBT);
-	        /* tooltip init if "tooltip" option is true */
-	        $oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
-	        /* click */
+			}
+			/* make the enlarge button */
+			$element.parent().prepend($enlargeBT);
+			/* tooltip init if "tooltip" option is true */
+			$oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tipTitle }):'';
+			/* click */
 			$($enlargeBT,$element.parent()).on('click',function(){
-				if(!activeClick){ //flood click protection ^^
-					return;
-				}
-				activeClick = false;
+				/* flood click protection ^^ */
+				if(!$activeClick){return;} 
+				$activeClick = false;
 				/* enlarge action */
 				if(!$enlargeBT.hasClass('reduce')){
-					$enlargeBT.toggleClass('enlargeAction');
 					/* enlarge click callback */
 					$oSettings.fnEnlargeClick($oSettings);
 					/* enlarge function */
 					$self.originalSize = Enlargeable.enlarge($oSettings, $element);
 					/* redefine tooltip title -> return elements with their original sizes */
-					$tooltipTitle=$oSettings.reduceTitle;
-				/* reduce action */
-				}else{
-					$enlargeBT.toggleClass('enlargeAction');
+					$tipTitle=$oSettings.reduceTitle;
+				}else{ //reduce action
 					/* reduce click callback */
 					$oSettings.fnReduceClick($oSettings);
 					/* reduce function */
 					Enlargeable.reduce($oSettings, $self.originalSize);
 					/* redefine tooltip title */
-					$tooltipTitle=$oSettings.enlargeTitle;
+					$tipTitle=$oSettings.enlargeTitle;
 				}
 				/* add or remove "reduce" class to the enlarge button */
 				$enlargeBT.toggleClass('reduce'); //add or remove .reduce class
 				/* set tooltip title */
-				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tooltipTitle }):'';
-				/* reactive "click" when timeout = speed option */
-				setTimeout(function() {activeClick = true;}, $oSettings.speed);
+				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tipTitle }):'';
+				/* "reactive" click when timeout = speed option */
+				setTimeout(function() {$activeClick = true;}, $oSettings.speed);
 			});
-
 		});
     };
-    
-    Enlargeable.settings = {
-		tooltip:false,
-		targetWidth:'958',						//target width
-		enlargeTitle:'',						//tooltip title for enlarge action
-		reduceTitle:'',							//tooltip title for reduce action
+    /* default settings */
+	Enlargeable.settings = {
+    	start:'enlarge',						//how enlargeable element start ? (enlarge or reduce)
+		tooltip:false,							//jquery ui tooltip ?
+		targetWidth:'958px',					//target width
+		targetHeight:'100%',					//target height
+		enlargeTitle:'Enlarge',					//tooltip title for enlarge action
+		reduceTitle:'Reduce',					//tooltip title for reduce action
 		speed:'500',							//animation speed
-		fnInit: function($oSettings){},			//init callback
-		fnEnlargeClick: function($oSettings){},	//enlarge click callback
-		fnReduceClick: function($oSettings){},	//reduce click callback
-		fnEnlarge: function($oSettings){},		//after enlarge callback
-		fnReduce: function($oSettings){}		//after reduce callback
-    };
+		fnInit: function(options){},			//init callback
+		fnEnlargeClick: function(options){},	//enlarge click callback
+		fnReduceClick: function(options){},		//reduce click callback
+		fnEnlarge: function(options){},			//after enlarge callback
+		fnReduce: function(options){}			//after reduce callback
+	};
     /*
      * Function enlarge
      * 
-     * @param {obj}        $oSettings, enlargeable settings object
-     * @param {jquery obj} $element, the enlargeable element
+     * @param {object}        $oSettings, enlargeable settings object
+     * @param {jquery object} $element, the enlargeable element
      * 
      */
     Enlargeable.enlarge = function($oSettings, $element) {
@@ -118,13 +115,13 @@
 				width:$this.width(),
 				height:$this.height()
 			});
-			$this.animate({width:$oSettings.targetWidth,height:'100%'},$oSettings.speed);
+			$this.animate({width:$oSettings.targetWidth,height:$oSettings.targetHeight},$oSettings.speed);
 		});
-		$element.animate({height:'100%', width:$oSettings.targetWidth},$oSettings.speed, function(){
+		$element.animate({width:$oSettings.targetWidth,height:$oSettings.targetHeight},$oSettings.speed, function(){
 			$oSettings.fnEnlarge($oSettings);
 		});
 		if($elementMaxHeight>0){
-			$element.css('max-height','100%');
+			$element.css('max-height',$oSettings.targetHeight);
 		}
 		return $o = {
 			oElement:$oElement,
@@ -134,8 +131,8 @@
     /*
      * Function reduce
      * 
-     * @param {obj}    $oSettings, enlargeable settings object
-     * @param {obj}    $oSize, enlargeable element and enlargeablePrison elements originals sizes
+     * @param {object}    $oSettings, enlargeable settings object
+     * @param {object}    $oSize, enlargeable element and enlargeablePrison elements originals sizes
      * 
      */
     Enlargeable.reduce = function($oSettings, $oSize) {
@@ -147,7 +144,6 @@
 			$oSettings.fnReduce($oSettings);
 		});
     };
-    
     /* jQuery aliases */
 	$.fn.enlargeable = Enlargeable;
 }( $ ));
