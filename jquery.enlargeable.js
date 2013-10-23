@@ -84,7 +84,7 @@
     
     Enlargeable.settings = {
 		tooltip:false,
-		enlargeWidth:'958',						//target width
+		targetWidth:'958',						//target width
 		enlargeTitle:'',						//tooltip title for enlarge action
 		reduceTitle:'',							//tooltip title for reduce action
 		speed:'500',							//animation speed
