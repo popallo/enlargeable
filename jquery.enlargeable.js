@@ -118,9 +118,9 @@
 				width:$this.width(),
 				height:$this.height()
 			});
-			$this.animate({width:$oSettings.enlargeWidth+'px',height:'100%'},$oSettings.speed);
+			$this.animate({width:$oSettings.enlargeWidth,height:'100%'},$oSettings.speed);
 		});
-		$element.animate({height:'100%', width:($oSettings.enlargeWidth)+'px'},$oSettings.speed, function(){
+		$element.animate({height:'100%', width:$oSettings.enlargeWidth},$oSettings.speed, function(){
 			$oSettings.fnEnlarge($oSettings);
 		});
 		if($elementMaxHeight>0){
