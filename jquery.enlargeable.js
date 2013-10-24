@@ -4,7 +4,7 @@
  * Update => 23-10-2013
  * © 2013, Licensed MIT (https://github.com/popallo/enlargeable/blob/master/LICENSE)
  * @author popallo
- * @version 0.9.3
+ * @version 0.9.4
  * 
  * DEPENDS : jquery >= 1.10.x, jquery ui >= 1.10.x (optional)
  * 
@@ -21,7 +21,6 @@
  * 
  * TODO make enlargeable fullscreenable... ^^
  * TODO make enlargeable skinnable... ^^
- * TODO(wip) make it works for "enlarge" or "reduce" size first
  * TODO make the plugin more flexible
  *
  */
@@ -32,8 +31,7 @@
 		return this.each(function(){
         	var $oSettings = $.extend({}, Enlargeable.settings, $options),
 				$element = $(this),
-        		$enlargeBT = $('<div/>').addClass('enlargeBT').attr('title',''),
-        		$tipTitle=$oSettings.enlargeTitle;
+        		$enlargeBT = $('<div/>').addClass('enlargeBT').attr('title','');
         	/* set options */
         	$oSettings.fnInit($oSettings);
         	/* in case of "tooltip" option is true, test if jquery ui is in da place ! */
@@ -43,7 +41,13 @@
 			/* make the enlarge button */
 			$element.parent().prepend($enlargeBT);
 			/* tooltip init if "tooltip" option is true */
-			$oSettings.tooltip?$('.enlargeBT').tooltip({position: { my: "center bottom-20", at: "right top" }, content: $tipTitle }):'';
+			$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $oSettings.enlargeTitle }):'';
+			/* start "enlarge" ! */
+			if($oSettings.start=='enlarge'){
+				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $oSettings.reduceTitle }):'';
+        		$enlargeBT.addClass('reduce');
+        		$self.originalSize = Enlargeable.enlarge($oSettings, $element);
+        	}
 			/* click */
 			$($enlargeBT,$element.parent()).on('click',function(){
 				Enlargeable.click($oSettings, $enlargeBT, $element, $self);
@@ -52,7 +56,7 @@
     };
     /* default settings */
 	Enlargeable.settings = {
-    	start:'enlarge',						//how enlargeable element start ? (enlarge or reduce)
+    	start:'reduce',							//how enlargeable element start ? (enlarge or reduce)
 		tooltip:false,							//jquery ui tooltip ?
 		targetWidth:'958px',					//target width
 		targetHeight:'100%',					//target height
@@ -60,11 +64,11 @@
 		reduceTitle:'Reduce',					//tooltip title for reduce action
 		speed:'500',							//animation speed
 		effect:'swing',							//easing effect
-		fnInit: function(options){},			//init callback
-		fnEnlargeClick: function(options){},	//enlarge click callback
-		fnReduceClick: function(options){},		//reduce click callback
-		fnEnlarge: function(options){},			//after enlarge callback
-		fnReduce: function(options){}			//after reduce callback
+		fnInit: function(settings){},			//init callback
+		fnEnlargeClick: function(settings){},	//enlarge click callback
+		fnReduceClick: function(settings){},	//reduce click callback
+		fnEnlarge: function(settings){},		//after enlarge callback
+		fnReduce: function(settings){}			//after reduce callback
 	};
 	/*
 	 * Function click
@@ -79,7 +83,7 @@
 		var $activeClick = true,
 			$tipTitle;
 		/* flood click protection ^^ */
-		if(!$activeClick){return;} 
+		if(!$activeClick){return;}
 		$activeClick = false;
 		/* enlarge action */
 		if(!$enlargeBT.hasClass('reduce')){
@@ -122,13 +126,13 @@
 			$aParents = [],
 			$o = {};
 		$parents.each(function(){
-			var $this = $(this);
+			var $parent = $(this);
 			$aParents.push({
-				element:$this,
-				width:$this.width(),
-				height:$this.height()
+				element:$parent,
+				width:$parent.width(),
+				height:$parent.height()
 			});
-			$this.animate({width:$oSettings.targetWidth,height:$oSettings.targetHeight},$oSettings.speed,$oSettings.effect);
+			$parent.animate({width:$oSettings.targetWidth,height:$oSettings.targetHeight},$oSettings.speed,$oSettings.effect);
 		});
 		$element.animate({width:$oSettings.targetWidth,height:$oSettings.targetHeight},$oSettings.speed,$oSettings.effect,function(){
 			$oSettings.fnEnlarge($oSettings);
@@ -149,7 +153,6 @@
 	 * 
 	 */
     Enlargeable.reduce = function($oSettings, $oSize) {
-    	if(typeof $oSize === 'undefined'){}
     	var $element = $oSize.oElement.element;
     	$.each($oSize.aParents, function(){
 			this.element.animate({width:this.width+'px',height:this.height+'px'},$oSettings.speed,$oSettings.effect);
