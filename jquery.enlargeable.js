@@ -38,11 +38,11 @@
 			if($oSettings.tooltip && !$.ui){
 	        	throw new Error('jquery.enlargeable requires jQuery ui 1.10.x OR make "tooltip" option to FALSE');
 			}
-			/* make the enlarge button */
+			/* make the enlarge/reduce button */
 			$element.parent().prepend($enlargeBT);
 			/* tooltip init if "tooltip" option is true */
 			$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $oSettings.enlargeTitle }):'';
-			/* start "enlarge" ! */
+			/* start "enlarge" ? */
 			if($oSettings.start=='enlarge'){
 				$oSettings.tooltip?$enlargeBT.tooltip({position: { my: "center bottom-20", at: "right top" }, content: $oSettings.reduceTitle }):'';
         		$enlargeBT.addClass('reduce');
@@ -57,13 +57,13 @@
     /* default settings */
 	Enlargeable.settings = {
     	start:'reduce',							//how enlargeable element start ? (enlarge or reduce)
-		tooltip:false,							//jquery ui tooltip ?
-		targetWidth:'958px',					//target width
-		targetHeight:'100%',					//target height
+		tooltip:false,							//jquery ui tooltip ? (true or false)
+		targetWidth:'958px',					//target width (px, %, ..)
+		targetHeight:'100%',					//target height (px, %, ..)
 		enlargeTitle:'Enlarge',					//tooltip title for enlarge action
 		reduceTitle:'Reduce',					//tooltip title for reduce action
-		speed:'500',							//animation speed
-		effect:'swing',							//easing effect
+		speed:'500',							//animation speed (ms)
+		effect:'swing',							//easing effect (look at easing's doc)
 		fnInit: function(settings){},			//init callback
 		fnEnlargeClick: function(settings){},	//enlarge click callback
 		fnReduceClick: function(settings){},	//reduce click callback
